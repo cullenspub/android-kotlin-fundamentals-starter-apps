@@ -25,4 +25,11 @@
         android:title="@string/share"
         android:visible="true"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/winnerToast"
+        android:enabled="true"
+        android:icon="@drawable/ic_icon_from_inkscape"
+        android:title="@string/share"
+        android:visible="true"
+        app:showAsAction="ifRoom" />
 </menu>

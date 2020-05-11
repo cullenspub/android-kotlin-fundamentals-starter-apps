@@ -16,21 +16,68 @@
 
 package com.example.android.navigation
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import com.example.android.navigation.databinding.FragmentGameWonBinding
 
 
 class GameWonFragment : Fragment() {
+    lateinit var data: GameWonFragmentArgs
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         val binding: FragmentGameWonBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_game_won, container, false)
+        binding.nextMatchButton.setOnClickListener{
+            it.findNavController().navigate(GameWonFragmentDirections.actionGameWonFragmentToGameFragment())
+        }
+        data = GameWonFragmentArgs.fromBundle(requireArguments())
+        setHasOptionsMenu(true)
+
+
         return binding.root
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.winner_menu, menu)
+        if (null == getShareIntent().resolveActivity(requireActivity().packageManager)) {
+            menu.findItem(R.id.share).setEnabled(false)
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.winnerToast -> showScore()
+            R.id.share -> shareScore()
+            else -> {
+                return super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    private fun showScore(): Boolean {
+        Toast.makeText(activity, "You answered ${data.numCorrect} of ${data.numQuestions} correctly", Toast.LENGTH_LONG).show()
+        return true
+    }
+
+    private fun shareScore(): Boolean {
+        startActivity(getShareIntent())
+        return true
+    }
+
+    private fun getShareIntent(): Intent {
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        shareIntent.setType("text/plain")
+                .putExtra(Intent.EXTRA_TEXT, getString(R.string.share_success_text, data.numCorrect, data.numQuestions ))
+        return shareIntent
     }
 }
