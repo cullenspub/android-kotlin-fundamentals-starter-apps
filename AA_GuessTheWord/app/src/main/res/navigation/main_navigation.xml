@@ -55,7 +55,7 @@
         tools:layout="@layout/score_fragment">
         <action
             android:id="@+id/action_restart"
-            app:destination="@+id/game_destination"
+            app:destination="@id/game_destination"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_right"

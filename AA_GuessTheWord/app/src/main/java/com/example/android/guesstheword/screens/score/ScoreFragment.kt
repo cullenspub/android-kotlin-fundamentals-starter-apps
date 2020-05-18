@@ -20,8 +20,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.NavArgs
+import androidx.navigation.NavDirections
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.guesstheword.R
 import com.example.android.guesstheword.databinding.ScoreFragmentBinding
@@ -30,12 +37,14 @@ import com.example.android.guesstheword.databinding.ScoreFragmentBinding
  * Fragment where the final score is shown, after the game is over
  */
 class ScoreFragment : Fragment() {
+    // Score View Model
+    private lateinit var viewModel:ScoreViewModel
+    private lateinit var viewModelFactory: ScoreViewModelFactory
 
-    override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
-    ): View? {
+    // Argugments from navigation action
+    private val args: ScoreFragmentArgs by navArgs()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
         // Inflate view and obtain an instance of the binding class.
         val binding: ScoreFragmentBinding = DataBindingUtil.inflate(
@@ -44,6 +53,20 @@ class ScoreFragment : Fragment() {
                 container,
                 false
         )
+
+        viewModelFactory = ScoreViewModelFactory(args.score)
+        viewModel = ViewModelProvider(viewModelStore,viewModelFactory).get(ScoreViewModel::class.java)
+
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+
+        viewModel.eventPlayAgain.observe(viewLifecycleOwner, Observer { replay ->
+            if (replay) {
+                val action = ScoreFragmentDirections.actionRestart()
+                findNavController().navigate(action)
+                viewModel.onPlayAgainComplete()
+            }
+        })
 
         return binding.root
     }
