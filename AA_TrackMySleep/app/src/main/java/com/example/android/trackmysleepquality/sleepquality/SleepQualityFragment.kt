@@ -22,7 +22,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.android.trackmysleepquality.R
+import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.databinding.FragmentSleepQualityBinding
 
 /**
@@ -32,7 +37,7 @@ import com.example.android.trackmysleepquality.databinding.FragmentSleepQualityB
  * and the database is updated.
  */
 class SleepQualityFragment : Fragment() {
-
+    val args: SleepQualityFragmentArgs by navArgs()
     /**
      * Called when the Fragment is ready to display content to the screen.
      *
@@ -44,9 +49,19 @@ class SleepQualityFragment : Fragment() {
         // Get a reference to the binding object and inflate the fragment views.
         val binding: FragmentSleepQualityBinding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_sleep_quality, container, false)
+        val application = requireActivity().application
+        val dataSource = SleepDatabase.getInstance(application).sleepDatabaseDao
 
-        val application = requireNotNull(this.activity).application
-
+        val viewModelFactory = SleepQualityViewModelFactory(args.sleepNightKey, dataSource)
+        val viewModel = ViewModelProvider(this,viewModelFactory).get(SleepQualityViewModel::class.java)
+        viewModel.navigateToSleepTracker.observe(viewLifecycleOwner, Observer { navigate ->
+            if(navigate == true) {
+                findNavController().navigate(SleepQualityFragmentDirections.actionSleepQualityFragmentToSleepTrackerFragment())
+                viewModel.navigatationToSleepTrackerCompelete()
+            }
+        })
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 }

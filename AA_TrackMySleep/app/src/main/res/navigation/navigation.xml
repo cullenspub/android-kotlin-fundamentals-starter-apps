@@ -32,7 +32,12 @@
             android:id="@+id/action_sleepTrackerFragment_to_sleepQualityFragment"
             app:destination="@id/sleep_quality_fragment"
             app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_right" />
+            app:popEnterAnim="@anim/slide_in_right" >
+            <argument
+                android:name="sleepNightKey"
+                app:argType="long"
+                android:defaultValue="0L" />
+        </action>
     </fragment>
 
     <fragment
